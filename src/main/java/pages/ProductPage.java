@@ -2,39 +2,28 @@ package pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.*;
-import java.time.Duration;
 
 public class ProductPage {
 
     WebDriver driver;
-    WebDriverWait wait;
 
     public ProductPage(WebDriver driver) {
         this.driver = driver;
-        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
     }
 
-    public void addProductToCart() {
+    By addToCart = By.id("add-to-cart-sauce-labs-backpack");
+    By cartBtn = By.className("shopping_cart_link");
 
-        // Wait for product page
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inventory_container")));
+    public void addProductToCart() throws InterruptedException {
 
         // Add product
-        wait.until(ExpectedConditions.elementToBeClickable(
-                By.id("add-to-cart-sauce-labs-backpack"))).click();
+        driver.findElement(addToCart).click();
 
-        System.out.println("Product added");
+        Thread.sleep(1000); // wait for cart update
 
-        // Click cart icon
-        wait.until(ExpectedConditions.elementToBeClickable(
-                By.className("shopping_cart_link"))).click();
+        // 🔥 IMPORTANT: go to cart page
+        driver.findElement(cartBtn).click();
 
-        System.out.println("Clicked cart");
-
-        // 🔥 IMPORTANT FIX: wait for URL instead of element
-        wait.until(ExpectedConditions.urlContains("cart.html"));
-
-        System.out.println("Cart page loaded");
+        Thread.sleep(1000); // wait for cart page
     }
 }

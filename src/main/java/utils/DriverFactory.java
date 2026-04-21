@@ -1,42 +1,19 @@
 package utils;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-
-import java.net.URL;
+import org.openqa.selenium.chrome.ChromeDriver;
+import io.github.bonigarcia.wdm.WebDriverManager;
 
 public class DriverFactory {
 
     public static WebDriver initDriver() {
         try {
-            ChromeOptions options = new ChromeOptions();
-
-            // Docker-friendly options
-            options.addArguments("--headless=new");
-            options.addArguments("--no-sandbox");
-            options.addArguments("--disable-dev-shm-usage");
-            options.addArguments("--window-size=1920,1080");
-
-            int retries = 3;
-
-            while (retries > 0) {
-                try {
-                    return new RemoteWebDriver(
-                            new URL("http://selenium:4444/wd/hub"),
-                            options
-                    );
-                } catch (Exception e) {
-                    System.out.println("Waiting for Selenium to be ready...");
-                    Thread.sleep(3000);
-                    retries--;
-                }
-            }
-
-            throw new RuntimeException("Selenium not reachable");
-
+            WebDriverManager.chromedriver().setup();
+            WebDriver driver = new ChromeDriver();
+            driver.manage().window().maximize();
+            return driver;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize driver", e);
+            throw new RuntimeException("Driver init failed", e);
         }
     }
 }

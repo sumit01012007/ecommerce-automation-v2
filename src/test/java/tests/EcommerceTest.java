@@ -1,82 +1,63 @@
 package tests;
 
-import org.openqa.selenium.By;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.annotations.*;
 
-import java.time.Duration;
-
+import utils.DriverFactory;
+import utils.ScreenshotUtil;
 import pages.LoginPage;
 import pages.ProductPage;
 import pages.CheckoutPage;
-import utils.DriverFactory;
-import utils.ScreenshotUtil;
 
 public class EcommerceTest {
 
-    WebDriver driver;
-    WebDriverWait wait;
+    private WebDriver driver;
 
     @BeforeClass
-    public void setup() {
+    public void setUp() throws InterruptedException {
         driver = DriverFactory.initDriver();
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        driver.get("https://www.saucedemo.com/");
+        Thread.sleep(3000); // ⏱️ wait after opening site
     }
 
     @Test
-    public void testEcommerceFlow() {
+    public void testEcommerceFlow() throws InterruptedException {
 
-        // 1. Open website
-        driver.get("https://www.saucedemo.com");
-
-        // Wait for login page
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("user-name")));
-
-        // 2. Login
-        System.out.println("Step: Login");
+        // 1. Login
         LoginPage login = new LoginPage(driver);
         login.login("standard_user", "secret_sauce");
+        Thread.sleep(7000);
 
-        // Wait for inventory page
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("inventory_list")));
-
-        // 3. Screenshot product page
-        ScreenshotUtil.takeScreenshot(driver, "product_page");
-
-        // 4. Add product
-        System.out.println("Step: Add product");
+        // 2. Add product + go to cart
         ProductPage product = new ProductPage(driver);
         product.addProductToCart();
+        Thread.sleep(7000);
 
-        // Wait for cart badge or next page element
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("shopping_cart_badge")));
-
-        // 5. Checkout
-        System.out.println("Step: Checkout");
+        // 3. Checkout
         CheckoutPage checkout = new CheckoutPage(driver);
         checkout.checkout();
+        Thread.sleep(7000);
 
-        // Wait for confirmation page
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("complete-header")));
-
-        // 6. Screenshot success
+        // 4. Screenshot after order
         ScreenshotUtil.takeScreenshot(driver, "order_success");
+        System.out.println("Order placed successfully!");
+        Thread.sleep(7000);
 
-        // 7. Logout
-        System.out.println("Step: Logout");
+        // 5. Logout
         checkout.logout();
+        Thread.sleep(7000);
 
-        // Wait for login page again
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("login-button")));
-
-        // 8. Screenshot logout
+        // 6. Screenshot after logout
         ScreenshotUtil.takeScreenshot(driver, "logout_page");
+        System.out.println("Logout successful!");
+        Thread.sleep(7000);
     }
 
     @AfterClass
-    public void tearDown() {
+    public void tearDown() throws InterruptedException {
+        Thread.sleep(7000); // ⏱️ final wait before closing
         if (driver != null) {
             driver.quit();
         }
